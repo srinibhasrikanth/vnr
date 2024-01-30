@@ -10,21 +10,28 @@ import AddCourse from "./pages/Admin/AddCourse";
 import AddResourcePerson from "./pages/Admin/AddResourcePerson";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import ReportTable from "./pages/Admin/ReportTable";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 const App = () => {
   return (
     <>
       <Navbar />
+      <ToastContainer />
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/admin-login" element={<AdminLogin />} />
         <Route path="/dashboard/:token" element={<UserDashboard />} />
-        <Route path="/register-course/:token" element={<RegistrationForm />} />
+        <Route
+          path="/register-course/:token/:id"
+          element={<RegistrationForm />}
+        />
         <Route path="/admin-dashboard/:token" element={<AdminDashboard />} />
         <Route path="/add-course/:token" element={<AddCourse />} />
         <Route path="/add-instructor/:token" element={<AddResourcePerson />} />
 
-        <Route path="/course-report/:token" element={<ReportTable />} />
+        <Route path="/course-report/:token/:id" element={<ReportTable />} />
       </Routes>
     </>
   );

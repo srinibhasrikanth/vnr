@@ -64,6 +64,7 @@ const Login = () => {
           ...auth,
           user: res.data.rollNumber,
           token: res.data.token,
+          
         });
         localStorage.setItem("auth", JSON.stringify(res.data));
         const token = JSON.parse(localStorage.getItem("auth")).token;
@@ -130,7 +131,9 @@ const Login = () => {
           />
         </div>
         <div className="flex pb-6 justify-center">
-          <Link to="/signup" style={{textDecoration:"underline"}}>Not registered yet? Signup now</Link>
+          <Link to="/signup" style={{ textDecoration: "underline" }}>
+            Not registered yet? Signup now
+          </Link>
         </div>
         <div className="flex justify-center">
           <Button

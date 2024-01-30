@@ -21,7 +21,6 @@ const AuthenticatedDashboard = ({ token }) => {
         const response = await axios.get(
           `http://localhost:8000/api/v1/courses/get-all-courses?token=${token}`
         );
-        console.log(`url token: ${token}`);
         setCourses(response.data);
         setLoading(false);
       } catch (error) {
@@ -35,9 +34,20 @@ const AuthenticatedDashboard = ({ token }) => {
   }, [token]);
 
   const renderCourseRow = (courseList) => (
-    <div style={{ display: "flex" }} className="ml-8">
+    <div
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        gap: "20px",
+        justifyContent: "flex-start",
+      }}
+    >
       {courseList.map((course) => (
-        <Card key={course.id} course={course} />
+        <Card
+          key={course.id}
+          course={course}
+          style={{ maxWidth: "calc(25% - 20px)" }}
+        />
       ))}
     </div>
   );
@@ -50,12 +60,12 @@ const AuthenticatedDashboard = ({ token }) => {
         <p style={{ color: "red" }}>{error}</p>
       ) : (
         <div>
-          <h1 className="ml-10 mt-5 mb-5 text-2xl font-semibold ">
+          <h1 className="ml-10 mt-5 mb-5 text-2xl font-semibold">
             Active Courses
           </h1>
           {renderCourseRow(courses.filter((course) => course.active === 1))}
 
-          <h1 className="ml-10 mt-5 mb-5 text-2xl font-semibold ">
+          <h1 className="ml-10 mt-5 mb-5 text-2xl font-semibold">
             Upcoming Courses
           </h1>
           {renderCourseRow(courses.filter((course) => course.upcoming === 1))}
@@ -68,12 +78,9 @@ const AuthenticatedDashboard = ({ token }) => {
 const Dashboard = () => {
   const location = useLocation();
   const tokenFromUrl = new URLSearchParams(location.search).get("auth");
-  const auth = JSON.parse(localStorage.getItem("auth")) || {}; // Parse the JSON string
-
-  console.log(auth.token);
+  const auth = JSON.parse(localStorage.getItem("auth")) || {};
 
   if (!auth.token) {
-    console.log("login please");
     return <UnauthenticatedDashboard />;
   }
 

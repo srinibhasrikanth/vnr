@@ -7,25 +7,21 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
 import axios from "axios";
-const RegisterCourse = () => {
+import { useEffect } from "react";
+import { useAuth } from "../../context/auth";
+import { toast } from "react-toastify";
+import { Link, useNavigate } from "react-router-dom";
+
+const RegisterCourse = ({ course }) => {
   // State for course details
-  const [courseDetails, setCourseDetails] = useState({
-    name: "Dummy Course",
-    year: "3",
-    timing: "10:00 AM - 12:00 PM",
-    resourcePerson: "John Doe",
-    duration: "2 hours",
-    description: "This is a dummy course description.",
-  });
+  const [courseDetails, setCourseDetails] = useState({});
+  const navigate = useNavigate();
 
   // State for registration form
-  const [registrationData, setRegistrationData] = useState({
-    name: "",
-    rollNo: "",
-    branch: "",
-    year: "",
-    section: "",
-  });
+  const [registrationData, setRegistrationData] = useState({});
+
+  // State to track registration status
+  const [registrationSuccess, setRegistrationSuccess] = useState(false);
 
   // Function to handle input changes in the registration form
   const handleInputChange = (field, value) => {
@@ -37,11 +33,66 @@ const RegisterCourse = () => {
 
   // Function to handle form submission
   const handleSubmit = async () => {
-    // Implement logic to handle the submitted registration data
-    console.log("Registration data submitted:", registrationData);
-    // You can add further processing or send the data to an API
-    
+    try {
+      const res = await axios.post(
+        "http://localhost:8000/api/v1/registration/register-course",
+        {
+          courseDetails: courseDetails,
+          userDetails: registrationData,
+        }
+      );
+      toast.success("Successfully registered");
+      setRegistrationSuccess(true); // Set registration success state to true
+    } catch (error) {
+      console.error("Error registering course:", error);
+    }
   };
+
+  useEffect(() => {
+    // Fetch course details from the backend
+    const fetchCourseDetails = async () => {
+      try {
+        // Extract the course ID from the URL
+        const courseId = window.location.pathname.split("/").pop(); // Assuming the course ID is the last part of the URL
+        // Make a GET request to fetch course details
+        const response = await axios.get(
+          `http://localhost:8000/api/v1/courses/get-course/${courseId}`
+        );
+        const courseData = response.data;
+        // Update the courseDetails state with the fetched data
+        setCourseDetails(courseData.course);
+      } catch (error) {
+        console.error("Error fetching course details:", error);
+      }
+    };
+
+    fetchCourseDetails();
+  }, []);
+
+  useEffect(() => {
+    // Fetch user details from the backend using the user ID stored in local storage
+    const fetchUserData = async () => {
+      try {
+        const userId = JSON.parse(localStorage.getItem("auth"))._id;
+        if (!userId) {
+          // Handle the case when user ID is not available in local storage
+          console.error("User ID not found in local storage");
+          return;
+        }
+        // Make a request to fetch user details using the user ID
+        const response = await axios.get(
+          `http://localhost:8000/api/v1/user/${userId}`
+        );
+        const userData = response.data;
+        // Set the fetched user details to the registration data state
+        setRegistrationData(userData);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   // Styling
   const fieldStyle = {
@@ -69,7 +120,7 @@ const RegisterCourse = () => {
                 Course Details
               </Typography>
               <Typography variant="subtitle1" mb={2}>
-                Name: {courseDetails.name}
+                Name: {courseDetails.courseName}
               </Typography>
               <Typography variant="subtitle1" mb={2}>
                 Year: {courseDetails.year}
@@ -99,75 +150,86 @@ const RegisterCourse = () => {
               </Typography>
               <TextField
                 label="Name"
+                id="outlined-read-only-input"
+                InputLabelProps={{ shrink: true }}
                 variant="outlined"
                 required
-                style={fieldStyle}
-                onChange={(e) => handleInputChange("name", e.target.value)}
                 value={registrationData.name}
+                style={fieldStyle}
+                InputProps={{
+                  readOnly: true,
+                }}
+                onChange={(e) => handleInputChange("name", e.target.value)}
               />
               <TextField
-                label="Roll Number"
                 variant="outlined"
+                label="Roll Number"
                 required
+                id="outlined-read-only-input"
                 style={fieldStyle}
                 onChange={(e) => handleInputChange("rollNo", e.target.value)}
-                value={registrationData.rollNo}
+                value={registrationData.rollNumber}
+                InputProps={{
+                  readOnly: true,
+                }}
+                InputLabelProps={{ shrink: true }}
               />
               <TextField
-                label="Branch"
-                select
                 variant="outlined"
                 required
+                label="Branch"
+                id="outlined-read-only-input"
                 style={fieldStyle}
                 onChange={(e) => handleInputChange("branch", e.target.value)}
                 value={registrationData.branch}
-              >
-                {["CSE", "IT", "ECE", "EEE", "Civil", "Mechanical"].map(
-                  (branch) => (
-                    <MenuItem key={branch} value={branch}>
-                      {branch}
-                    </MenuItem>
-                  )
-                )}
-              </TextField>
+                InputProps={{
+                  readOnly: true,
+                }}
+                InputLabelProps={{ shrink: true }}
+              />
               <TextField
-                label="Year"
-                select
                 variant="outlined"
                 required
+                label="Year"
+                id="outlined-read-only-input"
                 style={fieldStyle}
                 onChange={(e) => handleInputChange("year", e.target.value)}
                 value={registrationData.year}
-              >
-                {[1, 2, 3, 4].map((year) => (
-                  <MenuItem key={year} value={year}>
-                    {year}
-                  </MenuItem>
-                ))}
-              </TextField>
+                InputProps={{
+                  readOnly: true,
+                }}
+                InputLabelProps={{ shrink: true }}
+              />
               <TextField
-                label="Section"
-                select
                 variant="outlined"
                 required
+                label="Section"
+                id="outlined-read-only-input"
                 style={fieldStyle}
                 onChange={(e) => handleInputChange("section", e.target.value)}
                 value={registrationData.section}
-              >
-                {["A", "B", "C", "D"].map((section) => (
-                  <MenuItem key={section} value={section}>
-                    {section}
-                  </MenuItem>
-                ))}
-              </TextField>
-              <Button
-                variant="contained"
-                color="primary"
-                type="button"
-                onClick={handleSubmit}
-              >
-                Register
-              </Button>
+                InputProps={{
+                  readOnly: true,
+                }}
+                InputLabelProps={{ shrink: true }}
+              />
+
+              {registrationSuccess ? (
+                <>
+                  <Button variant="contained">
+                    <Link to="/dashboard/:token">Explore more courses</Link>
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  type="button"
+                  onClick={handleSubmit}
+                >
+                  Register
+                </Button>
+              )}
             </CardContent>
           </Card>
         </Grid>

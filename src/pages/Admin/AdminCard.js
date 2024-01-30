@@ -8,6 +8,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const AdminCard = ({ course }) => {
   const navigate = useNavigate();
@@ -17,7 +19,8 @@ const AdminCard = ({ course }) => {
       await axios.put(
         `http://localhost:8000/api/v1/courses/activate/${course._id}`
       );
-      console.log(`Activated`);
+      toast.success("Course activated successfully!");
+      window.location.reload();
       // Optionally, you can update the local state or fetch courses again
       // to reflect the changes without reloading the page.
     } catch (error) {
@@ -30,7 +33,8 @@ const AdminCard = ({ course }) => {
       await axios.put(
         `http://localhost:8000/api/v1/courses/deactivate/${course._id}`
       );
-      console.log("Success");
+      toast.success("Course deactivated successfully!");
+      window.location.reload();
       // Optionally, you can update the local state or fetch courses again
       // to reflect the changes without reloading the page.
     } catch (error) {
@@ -40,7 +44,7 @@ const AdminCard = ({ course }) => {
 
   const handleReport = () => {
     const token = JSON.parse(localStorage.getItem("auth")).token;
-    navigate(`/course-report/${token}`);
+    navigate(`/course-report/${token}/${course._id}`);
   };
 
   return (
@@ -68,15 +72,21 @@ const AdminCard = ({ course }) => {
         }}
       >
         {course.active === 1 && (
-          <Button size="small" onClick={handleDeactivate}>
-            Disable
-          </Button>
+          <div className="flex">
+            <Button size="small" onClick={handleDeactivate}>
+              Disable
+            </Button>
+            <Button size="small" onClick={handleReport}>
+              Report
+            </Button>
+          </div>
         )}
         {course.upcoming === 1 && (
           <>
             <Button size="small" onClick={handleActivate}>
               Activate
             </Button>
+
             <div className="flex justify-end">
               <Button size="small">
                 <EditIcon />

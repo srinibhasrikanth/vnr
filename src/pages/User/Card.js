@@ -6,13 +6,15 @@ import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { Link, useNavigate } from "react-router-dom";
+import RegisterCourse from "./RegistrationForm";
 
 const CourseCard = ({ course }) => {
   const navigate = useNavigate();
   const handleRegister = () => {
     const token = JSON.parse(localStorage.getItem("auth")).token;
 
-    navigate(`/register-course/${token}`);
+    navigate(`/register-course/${token}/${course._id}`);
+    <RegisterCourse key={course.id} course={course} />;
   };
   return (
     <Card sx={{ minWidth: 275 }} style={{ marginLeft: "10px" }}>

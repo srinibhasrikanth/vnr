@@ -5,8 +5,8 @@ import Toolbar from "@mui/material/Toolbar";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import { useAuth } from "../context/auth";
-import { Link, useNavigate } from "react-router-dom";
-import { Avatar, Typography } from "@mui/material";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Typography } from "@mui/material";
 import { useState, useEffect } from "react";
 
 export default function Navbar() {
@@ -15,6 +15,12 @@ export default function Navbar() {
   const storedAuth = JSON.parse(localStorage.getItem("auth")) || {};
   const token = storedAuth.token;
   const [isHovered, setIsHovered] = useState([false, false]);
+  const location = useLocation();
+
+  useEffect(() => {
+    // Reset hover effect when location changes
+    setIsHovered([false, false]);
+  }, [location]);
 
   const handleAdd = () => {
     navigate(`/add-course/${token}`);
@@ -25,8 +31,20 @@ export default function Navbar() {
   };
 
   const handleLogout = () => {
+    // Check if the user is an admin and redirect accordingly
+    if (auth?.user?.user?.role === "1") {
+      navigate("/admin-login");
+    } else {
+      navigate("/");
+    }
+
     logout();
-    navigate("/");
+  };
+
+  const handleLogoClick = () => {
+    if (token) {
+      navigate(`/admin-dashboard/${token}`);
+    }
   };
 
   return (
@@ -43,6 +61,7 @@ export default function Navbar() {
               className="flex"
             >
               <Grid item>
+                {/* Add Link component around the logo */}
                 <img
                   src="/images/vnrlogo.png"
                   alt="Logo"
@@ -50,7 +69,9 @@ export default function Navbar() {
                     width: "40px",
                     height: "40px",
                     marginRight: "8px",
+                    cursor: "pointer",
                   }}
+                  onClick={handleLogoClick}
                 />
               </Grid>
               <Grid item>
@@ -66,7 +87,10 @@ export default function Navbar() {
                       <>
                         <Button
                           color="inherit"
-                          style={{ color: "black" }}
+                          style={{
+                            color: "black",
+                            "&:hover": { backgroundColor: "#your-hover-color" },
+                          }}
                           onClick={handleAdd}
                         >
                           Add Course
@@ -74,14 +98,23 @@ export default function Navbar() {
 
                         <Button
                           color="inherit"
-                          style={{ color: "black" }}
+                          style={{
+                            color: "black",
+                            "&:hover": { backgroundColor: "#your-hover-color" },
+                          }}
                           onClick={handleInstructor}
                         >
                           Add Instructor
                         </Button>
                       </>
                     ) : null}
-                    <Button variant="outlined" onClick={handleLogout}>
+                    <Button
+                      variant="outlined"
+                      onClick={handleLogout}
+                      style={{
+                        "&:hover": { backgroundColor: "primary" },
+                      }}
+                    >
                       Logout
                     </Button>
                   </>
@@ -91,10 +124,9 @@ export default function Navbar() {
                       variant={isHovered[0] ? "contained" : "outlined"}
                       onMouseEnter={() => setIsHovered([true, false])}
                       onMouseLeave={() => setIsHovered([false, false])}
-
-                      //sx={{ color: isHovered ? "white" : "initial" }}
-                      //   className="px-4 py-2 transition-transform transform hover:scale-110 hover:text-white"
-                      //className={`${isHovered ?" text-white" : ""}`}
+                      style={{
+                        "&:hover": { backgroundColor: "#your-hover-color" },
+                      }}
                     >
                       <Link to="/" style={{ textDecoration: "none" }}>
                         Login
@@ -105,12 +137,11 @@ export default function Navbar() {
                       variant={isHovered[1] ? "contained" : "outlined"}
                       onMouseEnter={() => setIsHovered([false, true])}
                       onMouseLeave={() => setIsHovered([false, false])}
-
-                      //sx={{ color: isHovered ? "white" : "initial" }}
-                      //   className="px-4 py-2 transition-transform transform hover:scale-110 hover:text-white"
-                      //className={`${isHovered ?" text-white" : ""}`}
+                      style={{
+                        "&:hover": { backgroundColor: "#your-hover-color" },
+                      }}
                     >
-                      <Link to="/" style={{ textDecoration: "none" }}>
+                      <Link to="/signup" style={{ textDecoration: "none" }}>
                         Signup
                       </Link>
                     </Button>

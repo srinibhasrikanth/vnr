@@ -3,127 +3,98 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-const Signup = () => {
-  const navigate = useNavigate();
+import NavbarH from "./NavbarH";
+
+const SignupPage = () => {
   const [formData, setFormData] = useState({
-    rollNumber: "",
-    name: "",
-    year: "",
-    branch: "",
-    section: "",
-    admission: "",
-    gender: "",
-    phoneNumber: "",
-    whatsappNumber: "",
-    personalEmail: "",
-    currentAddress: "",
-    permanentAddress: "",
-    laptop: "",
-    fatherName: "",
-    profession: "",
-    fatherCompany: "",
-    motherName: "",
-    motherProfession: "",
-    motherCompany: "",
-    fatherWhatsappNumber: "",
-    parentAddress: "",
-    username: "",
-    password: "",
-    confirmPassword: "",
-    razorpayTransactionId: "",
+    // Your initial form data here
   });
 
   const handleInputChange = (field, value) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      [field]: value,
-    }));
-  };
+    const validationErrors = Object.entries(formData).reduce(
+      (errors, [field, data]) => {
+        if (!data.value) {
+          errors[field] = "This field is required";
+        } else if (field === "rollNo" && data.value.length !== 10) {
+          errors[field] = "Roll No should be 10 characters";
+        } else if (
+          (field === "phoneNumber" || field === "whatsappNumber") &&
+          !/^\d{10}$/.test(data.value)
+        ) {
+          errors[field] = "Enter a valid 10-digit number";
+        } else if (
+          field === "personalEmail" &&
+          !/\S+@\S+\.\S+/.test(data.value)
+        ) {
+          errors[field] = "Enter a valid email address";
+        }
+        return errors;
+      },
+      {}
+    );
 
-  const handleSubmit = async () => {
-    var options = {
-      key: "rzp_test_UpiX9NbPDSPRE9",
-      key_secret: "xEfrmNVHeJldfK0klLrczorH",
-      amount: 400 * 100,
-      currency: "INR",
-      name: "Membership Payment",
-      description: "for testing purpose",
-      handler: function (response) {
-        toast.success("Payment is successful");
-        // Store the Razorpay transaction ID in the form data
-        setFormData((prevData) => ({
-          ...prevData,
-          razorpayTransactionId: response.razorpay_payment_id,
-        }));
-
-        console.log(response.razorpayTransactionId);
-      },
-      prefill: {
-        name: `${formData.name}`,
-        email: `${formData.email}`,
-        contact: `${formData.phone}`,
-      },
-      notes: {
-        address: "Razorpay Corporate office",
-      },
-      theme: {
-        color: "#0d3e69",
-      },
-    };
-    var pay = new window.Razorpay(options);
-    pay.on("payment.success", async function (response) {
-      // Payment successful
-      toast.success("Payment is successful");
-      // Store the Razorpay transaction ID in the form data
-      const res = await axios.post(
-        "http://localhost:8000/api/v1/auth/register",
-        formData
-      );
-      console.log(res.data);
-      toast.success("Successfully registered");
-      navigate("/");
-      toast.success("Login Here");
+    if (Object.keys(validationErrors).length > 0) {
+      // Display validation errors
+      console.log("Form has errors. Please fix them before submitting.");
       setFormData((prevData) => ({
         ...prevData,
-        razorpayTransactionId: response.razorpay_payment_id,
+        ...Object.keys(validationErrors).reduce((newData, field) => {
+          newData[field] = {
+            ...prevData[field],
+            error: validationErrors[field],
+          };
+          return newData;
+        }, {}),
       }));
-      console.log(response.razorpayTransactionId);
-      // Make API request to save user registration data
-    });
-    pay.open();
+    } else {
+      // No validation errors, proceed with form submission
+      console.log("Form submitted!");
+      // Add logic to handle form data as needed
+    }
+  };
+
+  const handleSubmit = () => {
+    // Implement form submission logic here
+    // Check if there are any validation errors before submitting
+    const hasErrors = Object.values(formData).some((field) => !field.value);
+    if (hasErrors) {
+      console.log("Form has errors. Please fill in all required fields.");
+      return;
+    }
+
+    console.log("Form submitted!");
+    // Add logic to handle form data as needed
   };
 
   const fieldStyle = {
     marginBottom: "20px",
-    width: "100%",
+    width: "100%", // Adjust width for smaller fields
   };
 
   const containerStyle = {
     display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
+    flexDirection: "column", // Change to column layout
+    alignItems: "center", // Center items
     padding: "20px",
     maxWidth: "1200px",
     margin: "auto",
   };
 
   const sectionStyle = {
-    width: "100%",
-    marginBottom: "30px",
+    width: "100%", // Full width
+    marginBottom: "30px", // Add margin between sections
   };
 
   const columnsContainerStyle = {
     display: "grid",
-    gridTemplateColumns: "repeat(4, 1fr)",
-    gridGap: "20px",
+    gridTemplateColumns: "repeat(4, 1fr)", // 4 columns
+    gridGap: "20px", // Add gap between columns
     width: "100%",
   };
 
   return (
     <div>
+      <NavbarH />
       <div style={containerStyle}>
         {/* Section 1 */}
         <div style={sectionStyle}>
@@ -139,7 +110,8 @@ const Signup = () => {
               required
               style={fieldStyle}
               onChange={(e) => handleInputChange("name", e.target.value)}
-              name="name"
+              error={!!formData.name?.error}
+              helperText={formData.name?.error}
             />
 
             <TextField
@@ -147,8 +119,9 @@ const Signup = () => {
               variant="outlined"
               required
               style={fieldStyle}
-              onChange={(e) => handleInputChange("rollNumber", e.target.value)}
-              name="rollNumber"
+              onChange={(e) => handleInputChange("rollNo", e.target.value)}
+              error={!!formData.rollNo?.error}
+              helperText={formData.rollNo?.error}
             />
 
             <TextField
@@ -158,6 +131,8 @@ const Signup = () => {
               required
               style={fieldStyle}
               onChange={(e) => handleInputChange("year", e.target.value)}
+              error={!!formData.year?.error}
+              helperText={formData.year?.error}
             >
               {[1, 2, 3, 4].map((year) => (
                 <MenuItem key={year} value={year}>
@@ -173,6 +148,8 @@ const Signup = () => {
               required
               style={fieldStyle}
               onChange={(e) => handleInputChange("branch", e.target.value)}
+              error={!!formData.branch?.error}
+              helperText={formData.branch?.error}
             >
               {[
                 "CSE",
@@ -199,6 +176,8 @@ const Signup = () => {
               required
               style={fieldStyle}
               onChange={(e) => handleInputChange("section", e.target.value)}
+              error={!!formData.section?.error}
+              helperText={formData.section?.error}
             >
               {["A", "B", "C", "D"].map((section) => (
                 <MenuItem key={section} value={section}>
@@ -214,6 +193,8 @@ const Signup = () => {
               required
               style={fieldStyle}
               onChange={(e) => handleInputChange("admission", e.target.value)}
+              error={!!formData.admission?.error}
+              helperText={formData.admission?.error}
             >
               {["Regular", "LE"].map((admission) => (
                 <MenuItem key={admission} value={admission}>
@@ -229,6 +210,8 @@ const Signup = () => {
               required
               style={fieldStyle}
               onChange={(e) => handleInputChange("gender", e.target.value)}
+              error={!!formData.gender?.error}
+              helperText={formData.gender?.error}
             >
               {["Male", "Female", "Other"].map((gender) => (
                 <MenuItem key={gender} value={gender}>
@@ -243,6 +226,8 @@ const Signup = () => {
               required
               style={fieldStyle}
               onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
+              error={!!formData.phoneNumber?.error}
+              helperText={formData.phoneNumber?.error}
             />
 
             <TextField
@@ -253,6 +238,8 @@ const Signup = () => {
               onChange={(e) =>
                 handleInputChange("whatsappNumber", e.target.value)
               }
+              error={!!formData.whatsappNumber?.error}
+              helperText={formData.whatsappNumber?.error}
             />
 
             <TextField
@@ -263,6 +250,8 @@ const Signup = () => {
               onChange={(e) =>
                 handleInputChange("personalEmail", e.target.value)
               }
+              error={!!formData.personalEmail?.error}
+              helperText={formData.personalEmail?.error}
             />
 
             <TextField
@@ -273,6 +262,8 @@ const Signup = () => {
               onChange={(e) =>
                 handleInputChange("currentAddress", e.target.value)
               }
+              error={!!formData.currentAddress?.error}
+              helperText={formData.currentAddress?.error}
             />
 
             <TextField
@@ -282,6 +273,8 @@ const Signup = () => {
               onChange={(e) =>
                 handleInputChange("permanentAddress", e.target.value)
               }
+              error={!!formData.permanentAddress?.error}
+              helperText={formData.permanentAddress?.error}
             />
 
             <TextField
@@ -291,6 +284,8 @@ const Signup = () => {
               required
               style={fieldStyle}
               onChange={(e) => handleInputChange("laptop", e.target.value)}
+              error={!!formData.laptop?.error}
+              helperText={formData.laptop?.error}
             >
               <MenuItem value="Yes">Yes</MenuItem>
               <MenuItem value="No">No</MenuItem>
@@ -312,18 +307,26 @@ const Signup = () => {
               required
               style={fieldStyle}
               onChange={(e) => handleInputChange("fatherName", e.target.value)}
+              error={!!formData.fatherName?.error}
+              helperText={formData.fatherName?.error}
             />
             <TextField
               label="Profession"
               variant="outlined"
               style={fieldStyle}
-              onChange={(e) => handleInputChange("profession", e.target.value)}
+              onChange={(e) =>
+                handleInputChange("fatherProfession", e.target.value)
+              }
+              error={!!formData.fatherProfession?.error}
+              helperText={formData.fatherProfession?.error}
             />
             <TextField
               label="Company"
               variant="outlined"
               style={fieldStyle}
               onChange={(e) => handleInputChange("company", e.target.value)}
+              error={!!formData.company?.error}
+              helperText={formData.company?.error}
             />
             <TextField
               label="Mother's Name"
@@ -331,20 +334,26 @@ const Signup = () => {
               required
               style={fieldStyle}
               onChange={(e) => handleInputChange("motherName", e.target.value)}
+              error={!!formData.motherName?.error}
+              helperText={formData.motherName?.error}
             />
             <TextField
               label="Profession"
               variant="outlined"
               style={fieldStyle}
               onChange={(e) =>
-                handleInputChange("motherProfession", e.target.value)
+                handleInputChange("fatherProfession", e.target.value)
               }
+              error={!!formData.fatherProfession?.error}
+              helperText={formData.fatherProfession?.error}
             />
             <TextField
               label="Company"
               variant="outlined"
               style={fieldStyle}
               onChange={(e) => handleInputChange("company", e.target.value)}
+              error={!!formData.company?.error}
+              helperText={formData.company?.error}
             />
             <TextField
               label="Father's WhatsApp Number"
@@ -354,6 +363,8 @@ const Signup = () => {
               onChange={(e) =>
                 handleInputChange("fatherWhatsappNumber", e.target.value)
               }
+              error={!!formData.fatherWhatsappNumber?.error}
+              helperText={formData.fatherWhatsappNumber?.error}
             />
 
             <TextField
@@ -362,8 +373,10 @@ const Signup = () => {
               required
               style={fieldStyle}
               onChange={(e) =>
-                handleInputChange("parentAddress", e.target.value)
+                handleInputChange("parentsAddress", e.target.value)
               }
+              error={!!formData.parentsAddress?.error}
+              helperText={formData.parentsAddress?.error}
             />
             {/* Add more fields for Section 2 */}
           </div>
@@ -383,6 +396,8 @@ const Signup = () => {
               required
               style={fieldStyle}
               onChange={(e) => handleInputChange("username", e.target.value)}
+              error={!!formData.username?.error}
+              helperText={formData.username?.error}
             />
             <TextField
               label="Password"
@@ -391,6 +406,8 @@ const Signup = () => {
               required
               style={fieldStyle}
               onChange={(e) => handleInputChange("password", e.target.value)}
+              error={!!formData.password?.error}
+              helperText={formData.password?.error}
             />
             <TextField
               label="Re-enter Password"
@@ -398,9 +415,9 @@ const Signup = () => {
               type="password"
               required
               style={fieldStyle}
-              onChange={(e) =>
-                handleInputChange("confirmPassword", e.target.value)
-              }
+              onChange={(e) => handleInputChange("password", e.target.value)}
+              error={!!formData.password?.error}
+              helperText={formData.password?.error}
             />
             {/* Add more fields for Section 3 */}
             <Button
@@ -419,4 +436,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default SignupPage;
