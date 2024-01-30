@@ -1,27 +1,22 @@
-const mongoose = require("mongoose");
+// Define the Mongoose schema for the registerModel
+const mongoose = require('mongoose');
 
-const registerSchema = mongoose.Schema({
-  name: {
-    type: String,
-    require: true,
+const registerSchema = new mongoose.Schema({
+  courseDetails: {
+    type: Object, // You can adjust the type based on your actual data structure
+    required: true,
   },
-  rollNumber: {
-    type: String,
-    require: true,
+  userDetails: {
+    type: Object, // You can adjust the type based on your actual data structure
+    required: true,
   },
-  branch: {
-    type: String,
-    require: true,
-  },
-  year: {
-    type: String,
-    require: true,
-  },
-  section: {
-    type: String,
-    require: true,
+  registrationDate: {
+    type: Date,
+    default: Date.now,
   },
 });
 
-const registerModel = mongoose.model("registrations", registerSchema);
+// Create the Mongoose model for the registerModel
+const registerModel = mongoose.model('Register', registerSchema);
+
 module.exports = registerModel;

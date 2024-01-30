@@ -10,31 +10,29 @@ const registerController = async (req, res) => {
     const {
       rollNumber,
       name,
-      gender,
+      year,
       branch,
       section,
       admission,
-      year,
+      gender,
+      phoneNumber,
       whatsappNumber,
       personalEmail,
-      collegeEmail,
       currentAddress,
       permanentAddress,
-      state,
       laptop,
       fatherName,
-      fatherWhatsappNumber,
-      fatherPresentAddress,
-      fatherProfession,
-      fatherCompany,
+      profession,
+      fathercompany,
       motherName,
-      motherWhatsappNumber,
-      motherPresentAddress,
       motherProfession,
       motherCompany,
-
+      fatherWhatsappNumber,
+      parentAddress,
+      username,
       password,
       confirmPassword,
+      razorpayTransactionId,
     } = req.body;
     //validations
 
@@ -54,29 +52,28 @@ const registerController = async (req, res) => {
       const user = await new userModel({
         rollNumber,
         name,
-        gender,
+        year,
         branch,
         section,
         admission,
-        year,
+        gender,
+        phoneNumber,
         whatsappNumber,
         personalEmail,
-        collegeEmail,
         currentAddress,
         permanentAddress,
-        state,
         laptop,
         fatherName,
-        fatherWhatsappNumber,
-        fatherPresentAddress,
-        fatherProfession,
-        fatherCompany,
+        profession,
+        fathercompany,
         motherName,
-        motherWhatsappNumber,
-        motherPresentAddress,
         motherProfession,
         motherCompany,
+        fatherWhatsappNumber,
+        parentAddress,
+        username,
         password: hashedPassword,
+        razorpayTransactionId,
       }).save();
       // Send registration email
       sendRegistrationEmail(user.personalEmail, user.name);
@@ -96,7 +93,7 @@ const registerController = async (req, res) => {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Errro in Registeration",
+      message: "Error in Registeration",
       error,
     });
   }
@@ -186,6 +183,7 @@ const loginController = async (req, res) => {
       message: "login successfully",
       rollNumber,
       token,
+      _id: user._id,
     });
   } catch (error) {
     console.log(error);
@@ -261,7 +259,6 @@ const sendRegistrationEmail = async (userEmail, username) => {
 
   // Define the email body
   const emailBody = `
-    Subject: Welcome to VNRVJIET TRAINING - Your Account Registration is Complete!
 
     Dear ${username},
 
@@ -272,8 +269,7 @@ const sendRegistrationEmail = async (userEmail, username) => {
     Username: ${username}
     Email Address: ${userEmail}
 
-    To get started, you can log in to your account using the following link: [Login Link]
-
+    To get started, you can log in to your account using the following link: http://localhost:3000
     Once logged in, you'll be able to:
 
     - Access and manage your profile information
@@ -281,7 +277,7 @@ const sendRegistrationEmail = async (userEmail, username) => {
     - Place orders and track their status
     - Stay updated on promotions, news, and important announcements
 
-    If you have any questions or need assistance, our customer support team is here to help. Feel free to reach out to us at [Customer Support Email] or call us at [Customer Support Phone Number].
+    If you have any questions or need assistance, our customer support team is here to help. Feel free to reach out to us at Customer Support.
 
     Thank you for choosing VNRVJIET TRAINING. We look forward to serving you and providing you with a seamless and enjoyable experience.
 

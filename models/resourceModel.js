@@ -5,17 +5,23 @@ const resourceSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  email: {
+    type: String,
+    required: true,
+  },
   designation: {
     type: String,
     required: true,
   },
-  mobileNumber: {
+  phoneNo: {
     type: String,
     required: true,
   },
-  resourceId: {
+  rollNo: {
     type: String,
-    required: true,
+  },
+  idNumber: {
+    type: String,
   },
 });
 

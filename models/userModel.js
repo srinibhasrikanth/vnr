@@ -21,12 +21,11 @@ const userSchema = new mongoose.Schema(
     },
     gender: {
       type: String,
-      enum: ["Male", "Female", "Other"],
       required: true,
     },
     branch: {
       type: String,
-      enum: ["IT", "CSE", "CSE-AIDS"],
+
       required: true,
     },
     section: {
@@ -62,7 +61,7 @@ const userSchema = new mongoose.Schema(
     },
     collegeEmail: {
       type: String,
-      required: true,
+
       validate: {
         validator: function (v) {
           // Check if v is a valid email address
@@ -81,7 +80,6 @@ const userSchema = new mongoose.Schema(
     },
     state: {
       type: String,
-      required: true,
     },
     laptop: {
       type: String,
@@ -103,23 +101,19 @@ const userSchema = new mongoose.Schema(
     },
     fatherPresentAddress: {
       type: String,
-      required: true,
     },
     fatherProfession: {
       type: String,
-      required: true,
     },
     fatherCompany: {
       type: String,
-      required: true,
     },
     motherName: {
       type: String,
-      required: true,
     },
     motherWhatsappNumber: {
       type: String,
-      required: true,
+
       validate: {
         validator: (v) => WHATSAPP_NUMBER_PATTERN.test(v),
         message: (props) =>
@@ -128,16 +122,22 @@ const userSchema = new mongoose.Schema(
     },
     motherPresentAddress: {
       type: String,
-      required: true,
     },
     motherProfession: {
       type: String,
-      required: true,
     },
     motherCompany: {
       type: String,
     },
+    username: {
+      type: String,
+      required: true,
+    },
     password: {
+      type: String,
+      required: true,
+    },
+    razorpayTransactionId: {
       type: String,
       required: true,
     },
